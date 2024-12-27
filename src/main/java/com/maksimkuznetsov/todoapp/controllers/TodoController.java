@@ -5,11 +5,9 @@ import com.maksimkuznetsov.todoapp.repositories.TodoItemRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -43,6 +41,24 @@ public class TodoController implements CommandLineRunner {
 
         return "redirect:/";
     }
+    @PostMapping("/search")
+    public String searchTodoItem(@RequestParam("searchTerm") String searchTerm, Model model){
+        List<TodoItem> allTodos = todoItemRepository.findAll();
+        ArrayList<TodoItem> searchResult = new ArrayList<>();
+
+        for (TodoItem item : allTodos){
+         if(item.getTitle().toLowerCase().contains(searchTerm.toLowerCase())){
+             searchResult.add(item);
+         }
+        }
+        model.addAttribute("allTodos", searchResult);
+        model.addAttribute("newTodo", new TodoItem());
+        model.addAttribute("searchTerm", searchTerm);
+
+        return "index";
+
+    }
+
     @PostMapping("/removeAll")
     public String removeAll(){
         todoItemRepository.deleteAll();
